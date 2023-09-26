@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beewiser - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Learning_App.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center">
+                    <img src="/images/logo.png" width="50"/>
+                    <strong class="ms-2">Beewiser</strong>
+                </a>
+
+
+
+
+                @if (Context.Session.GetInt32("user_role") != null)
+                {
+
+                    <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+
+
+                        @if (Context.Session.GetInt32("user_role") == 99)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="AdminView">User List</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="CreateUserView">Add User</a>
+                            </li>
+                        }
+                        else if (Context.Session.GetInt32("user_role") == 2)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="CreateCourse">Create Course</a>
+                            </li>
+                        }
+
+                    </ul>
+
+                    <span class="text-warning">Welcome @(Context.Session.GetString("user_name"))</span>
+                }
+                else
+                {
+                    <div>
+                        <a type="button" class="btn btn-outline-warning me-2" asp-area="" asp-controller="Home" asp-action="Login">
+                            <span>Login</span>
+                        </a>
+                        <a type="button" class="btn btn-warning" asp-area="" asp-controller="Home" asp-action="SignUp">
+                            <span>Sign Up</span>
+                        </a>
+                    </div>
+                }
+
+            </div>
+        </div>
+        <!--<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BestLearn</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>-->
+    </header>
+    @RenderBody()
+
+    <footer class="footer mt-auto py-3 bg-body-tertiary bg-dark">
+        <div class="container">
+            <span class="text-body-secondary text-white">Coded with love.</span>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+<style>
+    body
+	{
+        background-image: url('/images/background-image.jpg');
+		background-size: cover; /* Adjust as needed */
+		background-repeat: no-repeat; /* Adjust as needed */
+        margin-bottom: 0px !important;
+	}
+</style>

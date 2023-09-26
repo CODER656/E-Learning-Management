@@ -1,0 +1,13 @@
+﻿using Learning_App.Models.Response;
+
+namespace Learning_App.Models;
+
+public class StudentCourseAssignment
+{
+    public int StudentCourseAssignmentId { get; set; }
+    public int UserId { get; set; }
+    public int AssignmentId { get; set; }
+    public float Score { get; set; }
+    public virtual User Student { get; set; }
+    public virtual CourseAssignments Assignment { get; set; }
+}

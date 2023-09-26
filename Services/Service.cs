@@ -173,7 +173,6 @@ namespace Learning_App.Services
                         Description = assignment.Description,
                         OverallScore = 0,
                         Title = assignment.Title,
-                        FileURL = "",
                     };
 
                     await _context.CourseAssignments.AddAsync(newAssignment); // lesson is Lesson
@@ -192,18 +191,31 @@ namespace Learning_App.Services
         }
         
         //tunahan-bas
-        public async Task<List<ListInstructorCourses>> GetCoursesList()
+        public async Task<List<ListCourses>> GetCoursesList(bool isStudent, int? userId)
         {
             try
-            { 
+            {
+                var enrolledCourseIds = new List<int>();
+                if(isStudent && userId != null)
+                {
+                    enrolledCourseIds = await _context.CourseEnrollment
+                        .Where(x => x.StudentId == userId.Value)
+                        .Select(x => x.CourseId).ToListAsync();
+                }
+
                 var courses= await _context.Courses // users is List<User>
-                .Select(x => new ListInstructorCourses() // x is User
+                .Include(x => x.Instructor)
+                .Select(x => new ListCourses() // x is User
                 {
                     CourseId = x.CourseId,
                     Title = x.Title,
                     Description = x.Description,
-                    UserId = x.UserId,
+                    Instructor = new ListCourses.InstructorInfo()
+                    {
+                        Name = x.Instructor.FirstName + " " + x.Instructor.LastName,
+                    },
                     ImageUrl = x.ImageUrl,
+                    IsEnrolled = isStudent ? enrolledCourseIds.Contains(x.CourseId) : false,
                 })
                 .ToListAsync(); 
 
@@ -213,7 +225,7 @@ namespace Learning_App.Services
             {
                 return null;
             }
-        } 
+        }
         public async Task<bool> DeleteCourse(int courseId)
         {
             try
@@ -237,9 +249,64 @@ namespace Learning_App.Services
             {
                 return false;
             }
-        }  
+        }
         //tunahan-bit
+
+        public async Task<bool> EnrollCourse(int courseId, int studentId)
+        {
+            await _context.CourseEnrollment.AddAsync(new CourseEnrollment()
+            {
+                CourseId = courseId,
+                Grade = 0,
+                StudentId = studentId,
+            });
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<Models.Response.DetailedCourseInfo> GetCourseDetail(int courseId, int userId)
+        {
+            try
+            {
+                var course = await _context.Courses
+                    .Include(x => x.Assignments)
+                    .Include(x => x.Lessons)
+                    .ThenInclude(x => x.Resources)
+                    .Where(x => x.CourseId == courseId)
+                    .Select(x => new Models.Response.DetailedCourseInfo()
+                    {
+                        CourseId = x.CourseId,
+                        Title = x.Title,
+                        Description = x.Description,
+                        ImageUrl = x.ImageUrl,
+                        Lessons = x.Lessons.Select(y => new DetailedCourseInfo.LessonInfo()
+                        {
+                            LessonId = y.LessonId,
+                            Title = y.Title,
+                            Description = y.Description,
+                            Resource = new DetailedCourseInfo.ResourceInfo()
+                            {
+                                ResourceId = y.Resources.First().ResourceId,
+                                Type = y.Resources.First().ResourceType,
+                                Content = y.Resources.First().ContentInfo,
+                            }
+                        }).ToList(),
+                        Assignments = x.Assignments.Select(y => new DetailedCourseInfo.AssignmentInfo()
+                        {
+                            AssignmentId = y.AssignmentId,
+                            Title = y.Title,
+                            Description = y.Description,
+                        }).ToList(),
+                    }).FirstAsync();
+
+                return course;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
     }
-
-
 }

@@ -8,6 +8,7 @@ public class StudentCourseAssignment
     public int UserId { get; set; }
     public int AssignmentId { get; set; }
     public float Score { get; set; }
+    public string FileUrl { get; set; }
     public virtual User Student { get; set; }
     public virtual CourseAssignments Assignment { get; set; }
 }

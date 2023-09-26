@@ -25,9 +25,19 @@ namespace Learning_App.Controllers
 
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var role = HttpContext.Session.GetInt32("user_role") ?? -1;
+            var userId = HttpContext.Session.GetInt32("user_id");
+
+            bool isStudent = false;
+            if(role == 1)
+            {
+                isStudent = true;
+            }
+
+            var courses = await _service.GetCoursesList(isStudent, userId);
+            return View(courses);
         }
 
         public IActionResult Privacy()
@@ -60,8 +70,14 @@ namespace Learning_App.Controllers
         {
             return View();
         }
-        
 
+        public async Task<IActionResult> CourseDetailView(int courseId)
+        {
+            var userId = HttpContext.Session.GetInt32("user_id");
+            var course = await _service.GetCourseDetail(courseId, userId.Value);
+
+            return View(course);
+        }
 
         [Route("signUpAction")]
         [HttpPost]
@@ -170,7 +186,7 @@ namespace Learning_App.Controllers
         
         public async Task<IActionResult> InstructorView()
         {
-            var course = await _service.GetCoursesList();
+            var course = await _service.GetCoursesList(false, null);
             return View(course);
         }
         
@@ -202,13 +218,12 @@ namespace Learning_App.Controllers
 
         [Route("createCourseAction")]
         [HttpPost]
-
         public async Task<IActionResult> CreateCourseAction(Course course, List<Lesson> Lessons, List<CourseResource> Resources, List<CourseAssignments> assignments, IFormFile ImageFile)
         {
             // Kursu veritabanına kaydetme işlemi burada yapılır
             // course nesnesi veritabanına eklenir ve kaydedilir
 
-            int userId = HttpContext.Session.GetInt32("user_id" )??0; 
+            int userId = HttpContext.Session.GetInt32("user_id" ) ?? 0; 
             course.UserId = userId;
             if (ImageFile != null && ImageFile.Length > 0)
             {
@@ -241,6 +256,19 @@ namespace Learning_App.Controllers
             }   
 
         }
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login"); 
+        }
 
+        public async Task<IActionResult> EnrollCourse(int courseId)
+        {
+            var studentId = HttpContext.Session.GetInt32("user_id") ?? -1;
+
+            await _service.EnrollCourse(courseId, studentId);
+
+            return RedirectToAction("Index");
+        }
     }
 }

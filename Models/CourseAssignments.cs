@@ -7,6 +7,5 @@ public class CourseAssignments
     public string Title { get; set; }
     public string Description { get; set; }
     public float OverallScore { get; set; }
-    public string FileURL { get; set; }
     public virtual Course Course { get; set; }
 }

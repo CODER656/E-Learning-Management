@@ -230,7 +230,7 @@ namespace Learning_App
                 .IsRequired();
 
                 entity.HasOne(e => e.Course)
-                    .WithMany()
+                    .WithMany(c => c.Lessons)
                     .HasForeignKey(e => e.CourseId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("course_lesson_fk");
@@ -258,6 +258,9 @@ namespace Learning_App
                 entity.Property(e => e.Score)
                 .HasColumnName("Score")
                 .IsRequired();
+
+                entity.Property(e => e.FileUrl)
+                .HasColumnName("FileUrl");
 
                 entity.HasOne(e => e.Student)
                     .WithMany()
@@ -299,11 +302,8 @@ namespace Learning_App
                 .HasColumnName("OverallScore")
                 .IsRequired();
 
-                entity.Property(e => e.FileURL)
-                .HasColumnName("FileURL");
-
                 entity.HasOne(e => e.Course)
-                    .WithMany()
+                    .WithMany(c => c.Assignments)
                     .HasForeignKey(e => e.CourseId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("assignment_course_fk");

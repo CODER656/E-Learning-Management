@@ -41,6 +41,12 @@
                         }
                         else if (Context.Session.GetInt32("user_role") == 2)
                         {
+                            //tunahan-bas
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="InstructorView">Course List</a>
+                            </li>
+                            //tunahan-bit
+                            
                             <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="CreateCourse">Create Course</a>
                             </li>

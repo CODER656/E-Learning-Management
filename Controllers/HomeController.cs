@@ -166,6 +166,32 @@ namespace Learning_App.Controllers
                 return Ok();
             }
         }
+        //tunahan-bas
+        
+        public async Task<IActionResult> InstructorView()
+        {
+            var course = await _service.GetCoursesList();
+            return View(course);
+        }
+        
+        [Route("DeleteCourse")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteCourse(int CourseId)
+        {
+            var response = await _service.DeleteCourse(CourseId);
+
+            if (response)
+            {
+                return RedirectToAction("InstructorView");
+            }
+            else
+            {
+                ViewBag.error = "Server error!";
+                return Ok();
+            }   
+        }
+        
+        //tunahan-bit
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

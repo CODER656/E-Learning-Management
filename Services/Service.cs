@@ -186,9 +186,59 @@ namespace Learning_App.Services
             {
                 return false;
             }
+            
 
             
         }
+        
+        //tunahan-bas
+        public async Task<List<ListInstructorCourses>> GetCoursesList()
+        {
+            try
+            { 
+                var courses= await _context.Courses // users is List<User>
+                .Select(x => new ListInstructorCourses() // x is User
+                {
+                    CourseId = x.CourseId,
+                    Title = x.Title,
+                    Description = x.Description,
+                    UserId = x.UserId,
+                    ImageUrl = x.ImageUrl,
+                })
+                .ToListAsync(); 
+
+                return courses; 
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        } 
+        public async Task<bool> DeleteCourse(int courseId)
+        {
+            try
+            {
+                var course = await _context.Courses
+                .Where(x => x.CourseId == courseId)
+                .FirstOrDefaultAsync();
+
+                if(course == null)
+                {
+                    return false;
+                }
+
+                _context.Courses.Remove(course);
+
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }  
+        //tunahan-bit
     }
 
 

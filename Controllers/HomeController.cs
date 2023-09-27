@@ -209,6 +209,46 @@ namespace Learning_App.Controllers
         
         //tunahan-bit
 
+        
+        //tunahan-bas2
+        public async Task<IActionResult> SubmitedAssignments()
+        {
+            var assignment = await _service.GetAssignmentList();
+            return View(assignment); 
+        }
+        
+        [HttpPost]
+        public IActionResult UpdateScore(int assignmentId, string instructorInput)
+        {
+            try
+            {
+                // assignmentId kullanarak ilgili görevi bul
+                var assignment = _context.StudentCourseAssignments.FirstOrDefault(a => a.StudentCourseAssignmentId == assignmentId);
+
+                if (assignment != null)
+                {
+                    // instructorInput kullanarak Score'u güncelle
+                    assignment.Score = float.Parse(instructorInput); // Örnek olarak string'i float'a çeviriyoruz.
+
+                    // Veritabanında değişiklikleri kaydet
+                    _context.SaveChanges();
+                }
+
+                // Güncelleme işleminden sonra, sayfayı tekrar yükle veya başka bir işlem yapabilirsiniz.
+                var updatedAssignments = _service.GetAssignmentList().Result; // Yeniden veri almak için
+                return View("SubmitedAssignments", updatedAssignments);
+            }
+            catch (Exception ex)
+            {
+                // Hata yönetimi yapmak istediğiniz yer
+                return RedirectToAction("Error");
+            }
+        }
+
+
+        //tunahan-bit2
+
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

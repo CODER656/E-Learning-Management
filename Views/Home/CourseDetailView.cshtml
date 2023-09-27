@@ -4,7 +4,7 @@
 
 @model Learning_App.Models.Response.DetailedCourseInfo;
 
-<div class="container bg-white p-3 m-5">
+<div class="container bg-white p-5 my-4">
     <div class="row mb-5">
         <div class="col-md-3">
             <img src="@Model.ImageUrl" alt="@Model.Title" class="img-fluid">
@@ -17,7 +17,7 @@
             </div>
 
             <!-- Add a Score Display -->
-            <p class="mt-2">Score: @Model.Grade</p>
+            <p class="mt-2">Your Progress: @Model.Grade%</p>
         </div>
     </div>
 

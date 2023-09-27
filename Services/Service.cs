@@ -251,7 +251,31 @@ namespace Learning_App.Services
             }
         }
         //tunahan-bit
+        //tunahan-bas2
+        public async Task<List<ListAssignments>> GetAssignmentList()
+        {
+            try
+            { 
+                var assignments= await _context.StudentCourseAssignments // users is List<User>
+                    
+                .Select(x => new ListAssignments() // x is User
+                {
+                    StudentCourseAssignmentId = x.StudentCourseAssignmentId,
+                    UserId = x.UserId,
+                    AssignmentId = x.AssignmentId,
+                    Score = x.Score,
+                    FileUrl = x.FileUrl,
+                })
+                .ToListAsync(); 
 
+                return assignments; 
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        } 
+        //tunahan-bit2
         public async Task<bool> EnrollCourse(int courseId, int studentId)
         {
             await _context.CourseEnrollment.AddAsync(new CourseEnrollment()

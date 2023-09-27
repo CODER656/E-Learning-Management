@@ -270,5 +270,47 @@ namespace Learning_App.Controllers
 
             return RedirectToAction("Index");
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UploadAssignment(IFormFile file, int assignmentId)
+        {
+            var userId = HttpContext.Session.GetInt32("user_id") ?? -1;
+
+            if (file != null && file.Length > 0)
+            {
+                // Dosya yükleme işlemi
+                var uploads = Path.Combine(_env.WebRootPath, "assignment_files"); // Dosyanın yükleneceği klasör
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName; // Dosya adını benzersizleştirme
+
+                var filePath = Path.Combine(uploads, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                await _service.SubmitAssignment(assignmentId, userId, "/assignment_files/" + uniqueFileName);
+
+            }
+
+            return RedirectToAction("Index");
+
+
+        }
+
+
+        public async Task<ActionResult> NextLesson(int courseId, int lessonId)
+        {
+            var userId = HttpContext.Session.GetInt32("user_id") ?? -1;
+
+            await _service.NextLesson(lessonId,userId,courseId);
+
+            return RedirectToAction("CourseDetailView", new { courseId = courseId });
+
+
+
+        }
+
     }
 }

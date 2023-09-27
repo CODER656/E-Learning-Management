@@ -153,6 +153,10 @@ namespace Learning_App
                 .HasColumnName("Grade")
                 .IsRequired();
 
+                entity.Property(e => e.LastCompletedLessonId)
+                .HasColumnName("LastCompletedLessonId");
+               
+
                 entity.HasOne(e => e.Student)
                     .WithMany(u => u.StudentCourses)
                     .HasForeignKey(e => e.StudentId)
@@ -307,6 +311,8 @@ namespace Learning_App
                     .HasForeignKey(e => e.CourseId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("assignment_course_fk");
+
+                
             });
         }
     }

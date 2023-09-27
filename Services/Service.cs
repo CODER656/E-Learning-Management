@@ -270,6 +270,17 @@ namespace Learning_App.Services
         {
             try
             {
+                var userSubmittedAssignmentIds = await _context.StudentCourseAssignments
+                    .Where(x => x.UserId == userId)
+                    .Select(x => x.AssignmentId)
+                    .ToListAsync();
+
+                var grade = await _context.CourseEnrollment
+                    .Where(x => x.StudentId == userId && x.CourseId == courseId)
+                    .Select(x => x.Grade)
+                    .FirstAsync();
+
+
                 var course = await _context.Courses
                     .Include(x => x.Assignments)
                     .Include(x => x.Lessons)
@@ -281,6 +292,7 @@ namespace Learning_App.Services
                         Title = x.Title,
                         Description = x.Description,
                         ImageUrl = x.ImageUrl,
+                        Grade = grade,
                         Lessons = x.Lessons.Select(y => new DetailedCourseInfo.LessonInfo()
                         {
                             LessonId = y.LessonId,
@@ -298,6 +310,7 @@ namespace Learning_App.Services
                             AssignmentId = y.AssignmentId,
                             Title = y.Title,
                             Description = y.Description,
+                            IsSubmitted = userSubmittedAssignmentIds.Contains(y.AssignmentId),
                         }).ToList(),
                     }).FirstAsync();
 
@@ -306,6 +319,147 @@ namespace Learning_App.Services
             catch (Exception e)
             {
                 return null;
+            }
+        }
+
+
+        public async Task<bool> SubmitAssignment(int assignmentId,int userId ,string filePath)
+        {
+
+            try
+            {
+                var newAssignment = new StudentCourseAssignment()
+                {
+                    AssignmentId = assignmentId,
+                    UserId = userId,
+                    FileUrl = filePath,
+                    Score = 0,
+                };
+
+                var courseId = await _context.CourseAssignments
+                    .Where(x => x.AssignmentId == assignmentId)
+                    .Select(x => x.CourseId)
+                    .FirstAsync();
+
+                await _context.StudentCourseAssignments.AddAsync(newAssignment);
+
+                await _context.SaveChangesAsync();
+
+                await UpdateGrade(userId, courseId);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }   
+        }
+
+
+        public async Task<bool> NextLesson(int lessonId, int userId,int courseId)
+        {
+
+            try
+            {
+                var SubmittedAssignmentIds = await _context.StudentCourseAssignments
+                    .Where(x => x.UserId == userId)
+                    .Select(x => x.AssignmentId)
+                    .ToListAsync();
+
+               
+
+                var CourseInfos = await _context.Courses
+                    .Include(x => x.Lessons)
+                    .Include(x => x.Assignments)
+                    .Where(x => x.CourseId == courseId)
+                    .Select(x =>new 
+                    {
+                        LessonIds = x.Lessons.OrderBy(y => y.LessonId).Select(y => y.LessonId).ToList(),
+                        AssignmentInfos = x.Assignments.OrderBy(y => y.AssignmentId).Select(y => new
+                        {
+                            Id = y.AssignmentId,
+                            IsSubmitted = SubmittedAssignmentIds.Contains(y.AssignmentId),
+
+                        }
+                        ).ToList(),
+
+                    })
+                    .FirstAsync();
+
+
+                
+                var Enrollment = await _context.CourseEnrollment
+                    .Where(x => x.StudentId == userId && x.CourseId == courseId)
+                    .FirstAsync();
+
+                Enrollment.LastCompletedLessonId = lessonId;
+
+                _context.CourseEnrollment.Update(Enrollment);
+                await _context.SaveChangesAsync();
+
+                await UpdateGrade(userId, courseId);  
+
+                return true;
+
+
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+
+        public async Task UpdateGrade(int userId,int courseId)
+        {
+            try
+            {
+                var SubmittedAssignmentIds = await _context.StudentCourseAssignments
+                   .Where(x => x.UserId == userId)
+                   .Select(x => x.AssignmentId)
+                   .ToListAsync();
+
+                var CourseInfos = await _context.Courses
+                    .Include(x => x.Lessons)
+                    .Include(x => x.Assignments)
+                    .Where(x => x.CourseId == courseId)
+                    .Select(x => new
+                    {
+                        LessonIds = x.Lessons.OrderBy(x => x.LessonId).Select(y => y.LessonId).ToList(),
+                        AssignmentInfos = x.Assignments.OrderBy(x => x.AssignmentId).Select(y => new
+                        {
+                            Id = y.AssignmentId,
+                            IsSubmitted = SubmittedAssignmentIds.Contains(y.AssignmentId),
+
+                        }
+                        ).ToList(),
+
+                    })
+                    .FirstAsync();
+
+
+                var point = 100 / (CourseInfos.LessonIds.Count + CourseInfos.AssignmentInfos.Count);
+
+                var Enrollment = await _context.CourseEnrollment
+                    .Where(x => x.StudentId == userId && x.CourseId == courseId)
+                    .FirstAsync();
+
+                var LessonPoint = 0;
+
+                if(Enrollment.LastCompletedLessonId != null)
+                {
+                    var CurrentIndex = CourseInfos.LessonIds.IndexOf(Enrollment.LastCompletedLessonId.Value);
+                    LessonPoint = point * (CurrentIndex + 1);
+                }
+                
+                var AssignmentPoint = CourseInfos.AssignmentInfos.Where(x => x.IsSubmitted).Count() * point;
+                Enrollment.Grade = LessonPoint + AssignmentPoint;
+                _context.CourseEnrollment.Update(Enrollment);
+                await _context.SaveChangesAsync();
+            }
+             catch(Exception e)
+            {
+                return ;
             }
         }
     }

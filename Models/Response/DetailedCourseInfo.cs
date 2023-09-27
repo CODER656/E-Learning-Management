@@ -6,6 +6,8 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public string ImageUrl { get; set; }
+
+        public double Grade { get; set; }
         public List<LessonInfo> Lessons { get; set; }
         public List<AssignmentInfo> Assignments { get; set; }
         
@@ -27,6 +29,8 @@
             public int AssignmentId { get; set; }
             public string Title { get; set; }
             public string Description { get; set; }
+
+            public bool IsSubmitted { get; set; }
         }
     }
 }

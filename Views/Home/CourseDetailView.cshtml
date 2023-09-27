@@ -12,6 +12,12 @@
         <div class="col-md-9">
             <h2>@Model.Title</h2>
             <p>@Model.Description</p>
+            <div class="progress mt-3">
+                <div class="progress-bar" role="progressbar" style="width: @Model.Grade%;" aria-valuenow="@Model.Grade" aria-valuemin="0" aria-valuemax="100">@Model.Grade</div>
+            </div>
+
+            <!-- Add a Score Display -->
+            <p class="mt-2">Score: @Model.Grade</p>
         </div>
     </div>
 
@@ -56,9 +62,11 @@
                             <div class="modal-body">
                                 <iframe class="iframe-window" src="@lesson.Resource.Content" frameborder="0" allowfullscreen></iframe>
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer d-flex justify-content-between">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a href="@Url.Action("NextLesson", "Home", new { courseId = Model.CourseId, lessonId = lesson.LessonId })" class="btn btn-primary">Next Lesson</a>
                             </div>
+                          
                         </div>
                     </div>
                 </div>
@@ -75,7 +83,25 @@
                     </h2>
                     <div id=@("collapse" + assignment.AssignmentId) class="accordion-collapse collapse" data-bs-parent="#assignmentsAccordion">
                         <div class="accordion-body">
-                            @assignment.Description
+                            <div class="d-flex justify-content-between align-items-center">
+                                 @assignment.Description
+                                 @if(assignment.IsSubmitted)
+								 {
+									<span class="badge bg-success">Submitted</span>
+								 }
+								 else
+								 {
+                                    <form method="post" enctype="multipart/form-data" action="@Url.Action("UploadAssignment", "Home")">
+                                        <div class="form-group">
+                                            <label for="fileUpload">Upload File</label>
+                                            <input type="file" class="form-control-file" id="fileUpload" name="file">
+                                        </div>
+                                        <input type="hidden" name="assignmentId" value="@assignment.AssignmentId">
+                                        <button type="submit" class="btn btn-primary">Send</button>
+                                    </form>
+								 }
+
+                            </div>
                         </div>
                     </div>
                 </div>

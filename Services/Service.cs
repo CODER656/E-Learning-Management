@@ -304,6 +304,23 @@ namespace Learning_App.Services
                     .Select(x => x.Grade)
                     .FirstAsync();
 
+                //var score = await _context.StudentCourseAssignments 
+                //    .Where(x => x.UserId == userId && x.AssignmentId
+                var courseAssignmentIds = await _context.Courses.Include(x => x.Assignments)
+                    .Where(x => x.CourseId==courseId)
+                    .Select(x => x.Assignments.Select(y=>y.AssignmentId)).FirstAsync();
+
+                var scores = _context.StudentCourseAssignments
+                        .Where(y => y.UserId == userId && courseAssignmentIds.Contains(y.AssignmentId))
+                        .Select(x => x.Score).ToList();
+               
+                double score = 0;
+                if (scores.Count > 0)
+                {
+                    
+                     score = scores.Sum(x => x) / scores.Count;
+                }
+
 
                 var course = await _context.Courses
                     .Include(x => x.Assignments)
@@ -317,6 +334,7 @@ namespace Learning_App.Services
                         Description = x.Description,
                         ImageUrl = x.ImageUrl,
                         Grade = grade,
+                        Score = score,
                         Lessons = x.Lessons.Select(y => new DetailedCourseInfo.LessonInfo()
                         {
                             LessonId = y.LessonId,

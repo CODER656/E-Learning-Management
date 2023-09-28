@@ -8,6 +8,7 @@
         public string ImageUrl { get; set; }
 
         public double Grade { get; set; }
+        public double Score { get; set; }
         public List<LessonInfo> Lessons { get; set; }
         public List<AssignmentInfo> Assignments { get; set; }
         

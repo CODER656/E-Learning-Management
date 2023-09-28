@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Db\" />
-    <Folder Include="wwwroot\course_thumbnails\" />
     <Folder Include="wwwroot\assignment_files\" />
   </ItemGroup>
 

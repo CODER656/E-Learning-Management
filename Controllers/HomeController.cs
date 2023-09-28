@@ -313,7 +313,7 @@ namespace Learning_App.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> UploadAssignment(IFormFile file, int assignmentId)
+        public async Task<IActionResult> UploadAssignment(IFormFile file, int assignmentId, int courseId)
         {
             var userId = HttpContext.Session.GetInt32("user_id") ?? -1;
 
@@ -334,7 +334,7 @@ namespace Learning_App.Controllers
 
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("CourseDetailView", new { courseId = courseId });
 
 
         }

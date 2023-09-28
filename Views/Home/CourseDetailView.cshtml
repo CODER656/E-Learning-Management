@@ -12,12 +12,27 @@
         <div class="col-md-9">
             <h2>@Model.Title</h2>
             <p>@Model.Description</p>
-            <div class="progress mt-3">
+            <p class="mt-2"> <b> Your Progress: </b>  @Model.Grade%</p>
+            <div class="progress mt-0">
                 <div class="progress-bar" role="progressbar" style="width: @Model.Grade%;" aria-valuenow="@Model.Grade" aria-valuemin="0" aria-valuemax="100">@Model.Grade</div>
             </div>
 
             <!-- Add a Score Display -->
-            <p class="mt-2">Your Progress: @Model.Grade%</p>
+            
+            
+            
+
+            <!-- Add a Score Display -->
+            <div class="">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-warning mt-4">
+                            <b> Your Score:    </b> <span class="font-weight-bold">@Model.Score</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -97,6 +112,7 @@
                                             <input type="file" class="form-control-file" id="fileUpload" name="file">
                                         </div>
                                         <input type="hidden" name="assignmentId" value="@assignment.AssignmentId">
+                                        <input type="hidden" name="courseId" value="@Model.CourseId">
                                         <button type="submit" class="btn btn-primary">Send</button>
                                     </form>
 								 }
